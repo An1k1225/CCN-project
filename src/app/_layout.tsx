@@ -1,18 +1,83 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StoreProvider, useStore } from "@/data/store";
+import { DARK_COLORS, LIGHT_COLORS } from "@/constants/theme";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+function ToastHost() {
+  const { toastMessage } = useStore();
+  const insets = useSafeAreaInsets();
 
-SplashScreen.preventAutoHideAsync();
+  if (!toastMessage) return null;
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
+    <View pointerEvents="none" style={[styles.toastWrap, { bottom: insets.bottom + 84 }]}>
+      <View style={styles.toast}>
+        <Text style={styles.toastText}>{toastMessage}</Text>
+      </View>
+    </View>
+  );
+}
+
+function RootNavigation() {
+  const { isDarkMode } = useStore();
+  const palette = isDarkMode ? DARK_COLORS : LIGHT_COLORS;
+
+  const navTheme = {
+    ...(isDarkMode ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDarkMode ? DarkTheme : DefaultTheme).colors,
+      primary: palette.primary,
+      background: palette.background,
+      card: palette.surfaceContainer,
+      text: palette.onSurface,
+      border: palette.outlineVariant,
+      notification: palette.primary,
+    },
+  };
+
+  return (
+    <ThemeProvider value={navTheme}>
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: palette.background } }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="auth" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="listing/[id]" />
+      </Stack>
+      <ToastHost />
     </ThemeProvider>
   );
 }
+
+export default function RootLayout() {
+  return (
+    <StoreProvider>
+      <RootNavigation />
+    </StoreProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  toastWrap: {
+    position: "absolute",
+    left: 24,
+    right: 24,
+    alignItems: "center",
+  },
+  toast: {
+    backgroundColor: "#322F35",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    maxWidth: "100%",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
+  },
+  toastText: { color: "#FFFFFF", fontSize: 14 },
+});
