@@ -164,6 +164,7 @@ export interface EcoTradeStore {
   sendChatMessage: (conversationId: string, text: string) => void;
   markConversationRead: (conversationId: string) => void;
   login: (emailOrUsername: string, password: string) => boolean;
+  loginWithProvider: (name: string, email: string) => void;
   signup: (name: string, email: string, username: string, password: string) => boolean;
   continueAsGuest: () => void;
   logout: () => void;
@@ -458,6 +459,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const loginWithProvider = useCallback((name: string, email: string) => {
+    setIsLoggedIn(true);
+    setHasAccount(true);
+    const cleanName = name.trim() || "EcoTrader";
+    const cleanEmail = email.trim() || "member@ecotrade.org";
+    const username = cleanEmail.split("@")[0].replace(/[^a-zA-Z0-9_.]/g, "");
+    setUserProfile((p) => ({
+      ...p,
+      name: cleanName,
+      email: cleanEmail,
+      username: username || `ecotrader_${Date.now() % 1000}`,
+    }));
+  }, []);
+
   const signup = useCallback(
     (name: string, email: string, username: string, password: string) => {
       setIsLoggedIn(true);
@@ -531,6 +546,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     sendChatMessage,
     markConversationRead,
     login,
+    loginWithProvider,
     signup,
     continueAsGuest,
     logout,

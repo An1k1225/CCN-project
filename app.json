@@ -8,7 +8,9 @@
     "scheme": "ecotradeexpo",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.ecotrade.app",
+      "icon": "./assets/expo.icon",
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {

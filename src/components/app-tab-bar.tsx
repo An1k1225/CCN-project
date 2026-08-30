@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs/types";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { AppIcon } from "@/components/app-icon";
 import { useTheme } from "@/constants/theme";
 

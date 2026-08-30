@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { BottomSheet, Host, Slider } from "@expo/ui";
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import Slider from "@react-native-community/slider";
 import { AppIcon } from "@/components/app-icon";
 import { EcoImage } from "@/components/eco-image";
 import { TYPE, useTheme } from "@/constants/theme";
@@ -24,11 +24,11 @@ export function TradeProposalSheet({
   );
 
   return (
-    <BottomSheet
-      isPresented
-      onDismiss={onDismiss}
-      snapPoints={["full"]}
-      contentPadding={0}
+    <Modal
+      visible
+      animationType="slide"
+      presentationStyle="fullScreen"
+      onRequestClose={onDismiss}
       testID="trade_proposal_sheet"
     >
       <View style={{ backgroundColor: colors.surfaceContainerLowest, flex: 1 }}>
@@ -89,16 +89,18 @@ export function TradeProposalSheet({
               +{Math.round(ecoPointsOffer)} pts
             </Text>
           </View>
-          <Host matchContents>
-            <Slider
-              value={ecoPointsOffer}
-              min={0}
-              max={200}
-              step={10}
-              onValueChange={(v) => setEcoPointsOffer(v)}
-              testID="trade_points_slider"
-            />
-          </Host>
+          <Slider
+            style={{ height: 40 }}
+            minimumValue={0}
+            maximumValue={200}
+            step={10}
+            value={ecoPointsOffer}
+            onValueChange={(v) => setEcoPointsOffer(v)}
+            minimumTrackTintColor={colors.primary}
+            maximumTrackTintColor={`${colors.outlineVariant}66`}
+            thumbTintColor={colors.primary}
+            testID="trade_points_slider"
+          />
 
           <View style={{ height: 12 }} />
 
@@ -137,7 +139,7 @@ export function TradeProposalSheet({
           </Pressable>
         </ScrollView>
       </View>
-    </BottomSheet>
+    </Modal>
   );
 }
 

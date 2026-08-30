@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import {
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from "react-native";
-import { BottomSheet, Host, Slider, Switch } from "@expo/ui";
+import Slider from "@react-native-community/slider";
 import { AppIcon } from "@/components/app-icon";
 import { TYPE, useTheme } from "@/constants/theme";
 import {
@@ -128,7 +130,12 @@ export function FilterSheet({
   };
 
   return (
-    <BottomSheet isPresented onDismiss={onDismiss} snapPoints={["full"]} contentPadding={0}>
+    <Modal
+      visible
+      animationType="slide"
+      presentationStyle="fullScreen"
+      onRequestClose={onDismiss}
+    >
       <View style={{ backgroundColor: colors.surfaceContainer, flex: 1 }}>
         <ScrollView
           contentContainerStyle={styles.sheetContent}
@@ -152,15 +159,17 @@ export function FilterSheet({
               ${initialFilter.minPrice.toFixed(0)} — Up to ${maxPrice.toFixed(0)}
             </Text>
           </View>
-          <Host matchContents>
-            <Slider
-              value={maxPrice}
-              min={0}
-              max={300}
-              step={50}
-              onValueChange={(v) => setMaxPrice(v)}
-            />
-          </Host>
+          <Slider
+            style={{ height: 40 }}
+            minimumValue={0}
+            maximumValue={300}
+            step={50}
+            value={maxPrice}
+            onValueChange={(v) => setMaxPrice(v)}
+            minimumTrackTintColor={colors.primary}
+            maximumTrackTintColor={`${colors.outlineVariant}66`}
+            thumbTintColor={colors.primary}
+          />
 
           <View style={{ height: 14 }} />
 
@@ -246,15 +255,17 @@ export function FilterSheet({
               Up to {maxDistance.toFixed(1)} mi
             </Text>
           </View>
-          <Host matchContents>
-            <Slider
-              value={maxDistance}
-              min={1}
-              max={25}
-              step={1}
-              onValueChange={(v) => setMaxDistance(v)}
-            />
-          </Host>
+          <Slider
+            style={{ height: 40 }}
+            minimumValue={1}
+            maximumValue={25}
+            step={1}
+            value={maxDistance}
+            onValueChange={(v) => setMaxDistance(v)}
+            minimumTrackTintColor={colors.primary}
+            maximumTrackTintColor={`${colors.outlineVariant}66`}
+            thumbTintColor={colors.primary}
+          />
 
           <View style={{ height: 16 }} />
 
@@ -274,9 +285,12 @@ export function FilterSheet({
                   Hide reserved or completed listings
                 </Text>
               </View>
-              <Host matchContents>
-                <Switch value={onlyInStock} onValueChange={setOnlyInStock} />
-              </Host>
+              <Switch
+                value={onlyInStock}
+                onValueChange={setOnlyInStock}
+                trackColor={{ false: `${colors.outlineVariant}66`, true: colors.primary }}
+                thumbColor={colors.surfaceContainerHighest}
+              />
             </View>
 
             <View style={[styles.divider, { backgroundColor: `${colors.outlineVariant}4D`, marginVertical: 12 }]} />
@@ -290,9 +304,12 @@ export function FilterSheet({
                   Show items from ID-verified community members
                 </Text>
               </View>
-              <Host matchContents>
-                <Switch value={onlyVerified} onValueChange={setOnlyVerified} />
-              </Host>
+              <Switch
+                value={onlyVerified}
+                onValueChange={setOnlyVerified}
+                trackColor={{ false: `${colors.outlineVariant}66`, true: colors.primary }}
+                thumbColor={colors.surfaceContainerHighest}
+              />
             </View>
           </View>
 
@@ -312,7 +329,7 @@ export function FilterSheet({
           </View>
         </ScrollView>
       </View>
-    </BottomSheet>
+    </Modal>
   );
 }
 

@@ -15,6 +15,8 @@ import { AppIcon } from "@/components/app-icon";
 import { ThemeModeToggleButton } from "@/components/common";
 import { TYPE, useTheme } from "@/constants/theme";
 import { useStore } from "@/data/store";
+import { isGoogleConfigured } from "@/auth/oauth-config";
+import { fetchGoogleUserInfo, signInWithApple, useGoogleAuth } from "@/auth/social-login";
 
 export default function AuthScreen() {
   const [isLoginTab, setIsLoginTab] = useState(true);
@@ -25,9 +27,11 @@ export default function AuthScreen() {
   const [confirmPassword, setConfirmPassword] = useState("password123");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [oauthBusy, setOauthBusy] = useState(false);
+  const { promptAsync: googlePromptAsync } = useGoogleAuth();
 
   const { colors } = useTheme();
-  const { isDarkMode, toggleDarkMode, login, signup, continueAsGuest, showToast } = useStore();
+  const { isDarkMode, toggleDarkMode, login, loginWithProvider, signup, continueAsGuest, showToast } = useStore();
 
   const handleLogin = (email: string, pwd: string) => {
     login(email, pwd);
@@ -39,6 +43,59 @@ export default function AuthScreen() {
     signup(name, email, uname, pwd);
     showToast(`Account created successfully! Welcome, ${name}`);
     router.replace("/(tabs)");
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (!isGoogleConfigured()) {
+      showToast("Google isn't configured. Add EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID to .env");
+      return;
+    }
+    setOauthBusy(true);
+    setErrorMessage(null);
+    try {
+      const result = await googlePromptAsync();
+      if (result?.type !== "success") {
+        showToast(result?.type === "error" ? "Google sign-in failed" : "Google sign-in was cancelled");
+        return;
+      }
+      const accessToken = result.authentication?.accessToken ?? result.params?.access_token;
+      if (!accessToken) {
+        showToast("Google sign-in returned no access token");
+        return;
+      }
+      const user = await fetchGoogleUserInfo(accessToken);
+      if (!user) {
+        showToast("Could not fetch your Google profile");
+        return;
+      }
+      loginWithProvider(user.name, user.email);
+      showToast(`Welcome, ${user.name}!`);
+      router.replace("/(tabs)");
+    } catch {
+      showToast("Google sign-in failed");
+    } finally {
+      setOauthBusy(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    if (Platform.OS !== "ios") return;
+    setOauthBusy(true);
+    setErrorMessage(null);
+    try {
+      const user = await signInWithApple();
+      if (!user) {
+        showToast("Apple sign-in failed or was cancelled");
+        return;
+      }
+      loginWithProvider(user.name, user.email);
+      showToast(`Welcome, ${user.name}!`);
+      router.replace("/(tabs)");
+    } catch {
+      showToast("Apple sign-in failed or was cancelled");
+    } finally {
+      setOauthBusy(false);
+    }
   };
 
   const submit = () => {
@@ -267,17 +324,25 @@ export default function AuthScreen() {
 
             <View style={styles.oauthRow}>
               <Pressable
-                onPress={() => handleLogin("google.user@example.com", "oauth_pass")}
-                style={[styles.oauthBtn, { borderColor: `${colors.outlineVariant}80` }]}
+                onPress={handleGoogleSignIn}
+                disabled={oauthBusy}
+                style={[styles.oauthBtn, { borderColor: `${colors.outlineVariant}80`, opacity: oauthBusy ? 0.6 : 1 }]}
               >
-                <Text style={{ fontWeight: "700", fontSize: 12, color: colors.onSurface }}>Google</Text>
+                <Text style={{ fontWeight: "700", fontSize: 12, color: colors.onSurface }}>
+                  {oauthBusy ? "Connecting…" : "Continue with Google"}
+                </Text>
               </Pressable>
-              <Pressable
-                onPress={() => handleLogin("apple.user@example.com", "oauth_pass")}
-                style={[styles.oauthBtn, { borderColor: `${colors.outlineVariant}80` }]}
-              >
-                <Text style={{ fontWeight: "700", fontSize: 12, color: colors.onSurface }}>Apple</Text>
-              </Pressable>
+              {Platform.OS === "ios" && (
+                <Pressable
+                  onPress={handleAppleSignIn}
+                  disabled={oauthBusy}
+                  style={[styles.oauthBtn, { borderColor: `${colors.outlineVariant}80`, opacity: oauthBusy ? 0.6 : 1 }]}
+                >
+                  <Text style={{ fontWeight: "700", fontSize: 12, color: colors.onSurface }}>
+                    {oauthBusy ? "Connecting…" : "Sign in with Apple"}
+                  </Text>
+                </Pressable>
+              )}
             </View>
           </View>
 
