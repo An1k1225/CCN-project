@@ -72,6 +72,7 @@ export interface UserProfile {
   memberSince: string;
   rating: number;
   totalTrades: number;
+  linkedProviders: string[];
 }
 
 export interface SearchFilter {

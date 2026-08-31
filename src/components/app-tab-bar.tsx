@@ -58,11 +58,26 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
         <View style={styles.tradeColumn} pointerEvents="box-none">
           <Pressable
             onPress={() => go("trade")}
-            style={[styles.tradeBtn, { backgroundColor: colors.primary, borderColor: `${colors.outlineVariant}80` }]}
+            style={[
+              styles.tradeBtn,
+              {
+                backgroundColor: activeRoute === "trade" ? colors.tertiary : colors.primary,
+                borderColor: `${colors.outlineVariant}80`,
+              },
+            ]}
           >
             <AppIcon name="swap_horiz" size={26} color={colors.onPrimary} />
           </Pressable>
-          <Text style={{ fontSize: 11, fontWeight: "700", color: colors.primary, marginTop: 2 }}>Trade</Text>
+          <Text
+            style={{
+              fontSize: 11,
+              fontWeight: "700",
+              color: activeRoute === "trade" ? colors.tertiary : colors.primary,
+              marginTop: 2,
+            }}
+          >
+            Trade
+          </Text>
         </View>
 
         {RIGHT_TAB_ITEMS.map((tab) => (

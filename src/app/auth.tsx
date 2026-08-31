@@ -40,7 +40,11 @@ export default function AuthScreen() {
   };
 
   const handleSignup = (name: string, email: string, uname: string, pwd: string) => {
-    signup(name, email, uname, pwd);
+    const ok = signup(name, email, uname, pwd);
+    if (!ok) {
+      setErrorMessage("Please fill in all required fields");
+      return;
+    }
     showToast(`Account created successfully! Welcome, ${name}`);
     router.replace("/(tabs)");
   };
@@ -68,7 +72,7 @@ export default function AuthScreen() {
         showToast("Could not fetch your Google profile");
         return;
       }
-      loginWithProvider(user.name, user.email);
+      loginWithProvider("google", user.name, user.email);
       showToast(`Welcome, ${user.name}!`);
       router.replace("/(tabs)");
     } catch {
@@ -88,7 +92,7 @@ export default function AuthScreen() {
         showToast("Apple sign-in failed or was cancelled");
         return;
       }
-      loginWithProvider(user.name, user.email);
+      loginWithProvider("apple", user.name, user.email);
       showToast(`Welcome, ${user.name}!`);
       router.replace("/(tabs)");
     } catch {
@@ -295,7 +299,7 @@ export default function AuthScreen() {
               </View>
             )}
 
-            <Pressable onPress={submit} style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }, styles.submitBtn, { marginTop: 20 }]}>
+            <Pressable onPress={submit} style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }, styles.submitBtn, { backgroundColor: colors.primary, marginTop: 20 }]}>
               <AppIcon name={isLoginTab ? "swap_horiz" : "check_circle"} size={18} color={colors.onPrimary} />
               <Text style={{ color: colors.onPrimary, fontWeight: "700", fontSize: 16, marginLeft: 8 }}>
                 {isLoginTab ? "Log In to EcoTrade" : "Create EcoTrade Account"}

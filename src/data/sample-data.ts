@@ -42,6 +42,7 @@ export const defaultUserProfile = () => ({
   memberSince: "June 2024",
   rating: 4.9,
   totalTrades: 16,
+  linkedProviders: [],
 });
 
 const makeListing = (p: Partial<ListingItem> & Pick<ListingItem, "id" | "title" | "category">): ListingItem => ({

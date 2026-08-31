@@ -45,6 +45,7 @@ export type AppIconName =
   | "mail"
   | "alternate_email"
   | "add_circle"
+  | "person_add"
   | "photo_library"
   | "sync_alt"
   | "notifications"
@@ -95,6 +96,7 @@ const GLYPHS: Record<AppIconName, string> = {
   mail: "mail",
   alternate_email: "alternate-email",
   add_circle: "add-circle",
+  person_add: "person-add",
   photo_library: "photo-library",
   sync_alt: "sync-alt",
   notifications: "notifications",

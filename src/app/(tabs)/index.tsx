@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppIcon, getCategoryIconName } from "@/components/app-icon";
 import { ListingItemCard, TopEcoHeader } from "@/components/common";
+import { FilterSheet } from "@/components/filter-sheet";
 import { TYPE, useTheme } from "@/constants/theme";
 import { useStore } from "@/data/store";
 import { categories } from "@/data/sample-data";
@@ -20,7 +21,8 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const { colors } = useTheme();
   const {
-    allListingsWithFavorites,
+    listings,
+    filteredListings,
     userProfile,
     filterState,
     setCategoryFilter,
@@ -29,19 +31,14 @@ export default function HomeScreen() {
     isDarkMode,
     togglePrivacyMode,
     openFilterSheet,
+    showFilterSheet,
+    updateFilter,
+    closeFilterSheet,
   } = useStore();
 
   const cardWidth = (width - 16 * 2 - 12) / 2;
 
-  const activeCategory = filterState.category;
-  const displayListings =
-    !activeCategory || activeCategory.toLowerCase() === "all"
-      ? allListingsWithFavorites
-      : activeCategory.toLowerCase() === "verified"
-        ? allListingsWithFavorites.filter((l) => l.isVerifiedTrader)
-        : allListingsWithFavorites.filter(
-            (l) => l.category.toLowerCase() === activeCategory.toLowerCase()
-          );
+  const displayListings = filteredListings;
 
   const onItemClick = useCallback((item: ListingItem) => {
     router.push({ pathname: "/listing/[id]", params: { id: item.id } });
@@ -90,7 +87,7 @@ export default function HomeScreen() {
       >
         <AppIcon name="eco" size={16} color={colors.primary} />
         <Text style={{ fontSize: 12, fontWeight: "500", color: colors.onSurface, marginLeft: 8 }}>
-          Real-time inventory: {allListingsWithFavorites.length} items available nearby
+          Real-time inventory: {listings.length} items available nearby
         </Text>
       </View>
 
@@ -181,6 +178,14 @@ export default function HomeScreen() {
           style={{ marginBottom: 12 }}
         />
       </View>
+
+      {showFilterSheet && (
+        <FilterSheet
+          initialFilter={filterState}
+          onApplyFilter={updateFilter}
+          onDismiss={closeFilterSheet}
+        />
+      )}
     </SafeAreaView>
   );
 }

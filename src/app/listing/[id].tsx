@@ -13,8 +13,9 @@ export default function ListingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const {
-    listings,
+    allListingsWithFavorites,
     userProfile,
+    hasAccount,
     toggleFavorite,
     openTradeProposal,
     closeTradeProposal,
@@ -26,7 +27,7 @@ export default function ListingDetailScreen() {
   // Reset selected image when switching items
   const [selectedImageIndexByItemId, setSelectedImageIndexByItemId] = useState<Record<string, number>>({});
 
-  const item = listings.find((l) => l.id === id);
+  const item = allListingsWithFavorites.find((l) => l.id === id);
 
   const images = useMemo(() => {
     if (!item) return [] as string[];
@@ -246,14 +247,25 @@ export default function ListingDetailScreen() {
           <Text style={{ marginLeft: 6, fontWeight: "600", color: colors.onSurface }}>Chat</Text>
         </Pressable>
 
-        <Pressable
-          onPress={() => openTradeProposal(item)}
-          style={[styles.proposeBtn, { backgroundColor: colors.primary }]}
-          testID="detail_propose_exchange_btn"
-        >
-          <AppIcon name="swap_horiz" size={20} color={colors.onPrimary} />
-          <Text style={{ marginLeft: 6, fontWeight: "700", color: colors.onPrimary }}>Propose Exchange</Text>
-        </Pressable>
+        {hasAccount ? (
+          <Pressable
+            onPress={() => openTradeProposal(item)}
+            style={[styles.proposeBtn, { backgroundColor: colors.primary }]}
+            testID="detail_propose_exchange_btn"
+          >
+            <AppIcon name="swap_horiz" size={20} color={colors.onPrimary} />
+            <Text style={{ marginLeft: 6, fontWeight: "700", color: colors.onPrimary }}>Propose Exchange</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => router.push("/auth")}
+            style={[styles.proposeBtn, { backgroundColor: colors.secondary }]}
+            testID="detail_signup_to_trade_btn"
+          >
+            <AppIcon name="person_add" size={20} color={colors.onSecondaryContainer} />
+            <Text style={{ marginLeft: 6, fontWeight: "700", color: colors.onSecondaryContainer }}>Sign Up to Trade</Text>
+          </Pressable>
+        )}
       </View>
 
       {/* Trade Proposal Bottom Sheet */}

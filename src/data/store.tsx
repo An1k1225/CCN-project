@@ -164,7 +164,7 @@ export interface EcoTradeStore {
   sendChatMessage: (conversationId: string, text: string) => void;
   markConversationRead: (conversationId: string) => void;
   login: (emailOrUsername: string, password: string) => boolean;
-  loginWithProvider: (name: string, email: string) => void;
+  loginWithProvider: (provider: "google" | "apple", name: string, email: string) => void;
   signup: (name: string, email: string, username: string, password: string) => boolean;
   continueAsGuest: () => void;
   logout: () => void;
@@ -183,6 +183,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [filterState, setFilterState] = useState<SearchFilter>(defaultSearchFilter);
   const [userStats, setUserStats] = useState<UserStats>(defaultUserStats);
   const [userProfile, setUserProfile] = useState<UserProfile>(defaultUserProfile);
+  const [createdAccounts, setCreatedAccounts] = useState<Record<string, UserProfile>>({});
   const [tradeOffers, setTradeOffers] = useState(initialTradeOffers);
   const [conversations, setConversations] = useState<ChatConversation[]>(initialConversations);
 
@@ -200,13 +201,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const profileRef = useRef(userProfile);
   const filterStateRef = useRef(filterState);
   const privacyModeRef = useRef(privacyModeEnabled);
+  const userStatsRef = useRef(userStats);
+  const createdAccountsRef = useRef(createdAccounts);
 
   useEffect(() => {
     listingsRef.current = listings;
     profileRef.current = userProfile;
     filterStateRef.current = filterState;
     privacyModeRef.current = privacyModeEnabled;
-  }, [listings, userProfile, filterState, privacyModeEnabled]);
+    userStatsRef.current = userStats;
+    createdAccountsRef.current = createdAccounts;
+  }, [listings, userProfile, filterState, privacyModeEnabled, userStats, createdAccounts]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) {
+        clearTimeout(toastTimer.current);
+        toastTimer.current = null;
+      }
+    };
+  }, []);
 
   const clearToast = useCallback(() => {
     if (toastTimer.current) {
@@ -298,6 +312,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const listing = listingsRef.current.find((l) => l.id === listingId);
       if (!listing) return;
 
+      const availablePoints = userStatsRef.current.ecoPoints;
+      const pointsToSpend = Math.min(offeredEcoPoints, availablePoints);
+      const remainingPoints = availablePoints - pointsToSpend;
+
       const newOffer = {
         id: uid("offer"),
         listingId,
@@ -346,7 +364,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         return [newConv, ...convs];
       });
 
-      setUserStats((stats) => ({ ...stats, activeTrades: stats.activeTrades + 1 }));
+      setUserStats((stats) => ({
+        ...stats,
+        activeTrades: stats.activeTrades + 1,
+        ecoPoints: remainingPoints,
+      }));
       setTradeProposalTarget(null);
       showToast("Exchange proposal sent successfully!");
     },
@@ -459,27 +481,43 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const loginWithProvider = useCallback((name: string, email: string) => {
-    setIsLoggedIn(true);
-    setHasAccount(true);
-    const cleanName = name.trim() || "EcoTrader";
-    const cleanEmail = email.trim() || "member@ecotrade.org";
-    const username = cleanEmail.split("@")[0].replace(/[^a-zA-Z0-9_.]/g, "");
-    setUserProfile((p) => ({
-      ...p,
-      name: cleanName,
-      email: cleanEmail,
-      username: username || `ecotrader_${Date.now() % 1000}`,
-    }));
-  }, []);
+  const loginWithProvider = useCallback(
+    (provider: "google" | "apple", name: string, email: string) => {
+      setIsLoggedIn(true);
+      const cleanEmail = email.trim().toLowerCase() || "";
+      const linked = (prev: string[]) =>
+        prev.includes(provider) ? prev : [...prev, provider];
+
+      const existing = cleanEmail ? createdAccountsRef.current[cleanEmail] : undefined;
+
+      if (existing) {
+        setUserProfile((p) => ({ ...existing, linkedProviders: linked(existing.linkedProviders) }));
+        setHasAccount(true);
+      } else {
+        const cleanName = name.trim() || "EcoTrader";
+        const username =
+          (cleanEmail ? cleanEmail.split("@")[0].replace(/[^a-zA-Z0-9_.]/g, "") : "") ||
+          `ecotrader_${Date.now() % 1000}`;
+        setHasAccount(true);
+        setUserProfile((p) => ({
+          ...p,
+          name: cleanName,
+          email: cleanEmail || "member@ecotrade.org",
+          username,
+          linkedProviders: linked(profileRef.current.linkedProviders ?? []),
+        }));
+      }
+    },
+    []
+  );
 
   const signup = useCallback(
     (name: string, email: string, username: string, password: string) => {
-      setIsLoggedIn(true);
-      setHasAccount(true);
-      setUserProfile({
+      if (!name.trim() || !email.trim() || !password.trim()) return false;
+      const cleanEmail = email.trim().toLowerCase();
+      const newProfile: UserProfile = {
         name: name.trim() ? name : "New EcoTrader",
-        email: email.trim() ? email : "member@ecotrade.org",
+        email: cleanEmail,
         username: username.trim()
           ? username
           : `ecotrader_${Date.now() % 1000}`,
@@ -489,7 +527,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         memberSince: "August 2026",
         rating: 5.0,
         totalTrades: 0,
-      });
+        linkedProviders: ["email"],
+      };
+      setCreatedAccounts((acc) => ({ ...acc, [cleanEmail]: newProfile }));
+      setUserProfile(newProfile);
+      setIsLoggedIn(true);
+      setHasAccount(true);
       return true;
     },
     []
