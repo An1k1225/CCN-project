@@ -53,7 +53,7 @@ export const RADIUS: Record<string, number> = {
   xxl: 24,
 };
 
-// EcoTrade is light-theme only. Kept as a hook so every screen keeps a single
+// PURAN HUT is light-theme only. Kept as a hook so every screen keeps a single
 // source of truth for the palette.
 export function useTheme() {
   return { isDark: false, colors: LIGHT_COLORS as Palette };

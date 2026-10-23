@@ -12,6 +12,7 @@ import {
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppIcon } from "@/components/app-icon";
+import { BrandWordmark } from "@/components/common";
 import { TYPE, useTheme } from "@/constants/theme";
 import { useStore } from "@/data/store";
 import { isGoogleConfigured } from "@/auth/oauth-config";
@@ -136,12 +137,7 @@ export default function AuthScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={[styles.topBar, { backgroundColor: colors.background }]}>
-          <View style={styles.logoRow}>
-            <AppIcon name="eco" size={24} color={colors.primary} />
-            <Text style={[TYPE.titleMedium, { fontWeight: "700", color: colors.primary, marginLeft: 6 }]}>
-              EcoTrade
-            </Text>
-          </View>
+          <BrandWordmark variant="hero" tagline="SUSTAINABLE TRADE" />
         </View>
 
         <ScrollView
@@ -308,7 +304,7 @@ export default function AuthScreen() {
             <Pressable onPress={submit} style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }, styles.submitBtn, { backgroundColor: colors.primary, marginTop: 20 }]}>
               <AppIcon name={isLoginTab ? "swap_horiz" : "check_circle"} size={18} color={colors.onPrimary} />
               <Text style={{ color: colors.onPrimary, fontWeight: "700", fontSize: 16, marginLeft: 8 }}>
-                {isLoginTab ? "Log In to EcoTrade" : "Create EcoTrade Account"}
+                {isLoginTab ? "Log In to PURAN HUT" : "Create PURAN HUT Account"}
               </Text>
             </Pressable>
 
@@ -454,7 +450,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  logoRow: { flexDirection: "row", alignItems: "center" },
   scrollContent: { flexGrow: 1, justifyContent: "center", paddingHorizontal: 20, paddingBottom: 28 },
 
   authCard: {

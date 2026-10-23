@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppIcon } from "@/components/app-icon";
 import { EcoImage } from "@/components/eco-image";
+import { BrandWordmark } from "@/components/common";
 import { TYPE, useTheme } from "@/constants/theme";
 
 const ONBOARDING_IMG_1 =
@@ -39,12 +40,7 @@ export default function OnboardingScreen() {
               <AppIcon name="arrow_back" size={24} color={colors.onSurfaceVariant} />
             </Pressable>
           ) : (
-            <View style={styles.logoRow}>
-              <AppIcon name="eco" size={26} color={colors.primary} />
-              <Text style={[TYPE.titleLarge, { fontWeight: "700", color: colors.primary, marginLeft: 6 }]}>
-                EcoTrade
-              </Text>
-            </View>
+            <BrandWordmark variant="hero" tagline="SUSTAINABLE TRADE" />
           )}
 
           <StepIndicator currentStep={step} totalSteps={4} />
@@ -309,7 +305,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: 4,
   },
-  logoRow: { flexDirection: "row", alignItems: "center" },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 10 },
   dotsRow: { flexDirection: "row", alignItems: "center" },
 

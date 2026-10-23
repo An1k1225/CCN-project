@@ -33,14 +33,79 @@ export function TopRightProfileAvatar({
   );
 }
 
+/**
+ * Brand lockup for PURAN HUT. The wordmark is set in spaced small caps next to
+ * a soft eco badge so it reads as a considered logo rather than plain text.
+ */
+export function BrandWordmark({
+  variant = "compact",
+  tagline,
+}: {
+  variant?: "hero" | "compact";
+  tagline?: string;
+}) {
+  const { colors } = useTheme();
+  const isHero = variant === "hero";
+  const badgeSize = isHero ? 36 : 26;
+  const letterSpacing = isHero ? 2.6 : 1.5;
+
+  return (
+    <View style={styles.brandRow}>
+      <View
+        style={[
+          styles.brandBadge,
+          {
+            width: badgeSize,
+            height: badgeSize,
+            borderRadius: badgeSize / 2,
+            backgroundColor: `${colors.primary}14`,
+            borderColor: `${colors.primary}2E`,
+          },
+        ]}
+      >
+        <AppIcon name="eco" size={isHero ? 20 : 15} color={colors.primary} />
+      </View>
+      <View>
+        <Text
+          numberOfLines={1}
+          style={{
+            color: colors.primary,
+            fontSize: isHero ? 17 : 14,
+            lineHeight: isHero ? 21 : 18,
+            fontWeight: "700",
+            letterSpacing,
+            marginRight: -letterSpacing,
+          }}
+        >
+          PURAN HUT
+        </Text>
+        {!!tagline && (
+          <Text
+            numberOfLines={1}
+            style={{
+              color: colors.onSurfaceVariant,
+              fontSize: 8,
+              lineHeight: 11,
+              fontWeight: "600",
+              letterSpacing: isHero ? 2.4 : 1.9,
+              marginTop: isHero ? 2 : 1,
+              marginRight: isHero ? -2.4 : -1.9,
+            }}
+          >
+            {tagline}
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+}
+
 export function TopEcoHeader({
-  title = "EcoTrade",
   locationName = "0.5 mi • Portland",
   onLocationClick = () => {},
   onProfileClick,
   avatarUrl = "",
 }: {
-  title?: string;
   locationName?: string;
   onLocationClick?: () => void;
   onProfileClick: () => void;
@@ -62,10 +127,7 @@ export function TopEcoHeader({
       </View>
 
       <View style={styles.headerCenterRow}>
-        <AppIcon name="eco" size={22} color={colors.primary} />
-        <Text style={[TYPE.titleLarge, { fontWeight: "700", color: colors.onSurface, marginLeft: 6 }]}>
-          {title}
-        </Text>
+        <BrandWordmark />
       </View>
 
       <View style={styles.headerRightRow}>
@@ -384,7 +446,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  headerCenterRow: { flexDirection: "row", alignItems: "center" },
+  headerCenterRow: { flexDirection: "row", alignItems: "center", flexShrink: 1 },
+
+  brandRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  brandBadge: { alignItems: "center", justifyContent: "center", borderWidth: 1 },
   headerRightRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   locationRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
 
