@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StoreProvider, useStore } from "@/data/store";
-import { DARK_COLORS, LIGHT_COLORS } from "@/constants/theme";
+import { LIGHT_COLORS } from "@/constants/theme";
 
 function ToastHost() {
   const { toastMessage } = useStore();
@@ -23,13 +23,12 @@ function ToastHost() {
 }
 
 function RootNavigation() {
-  const { isDarkMode } = useStore();
-  const palette = isDarkMode ? DARK_COLORS : LIGHT_COLORS;
+  const palette = LIGHT_COLORS;
 
   const navTheme = {
-    ...(isDarkMode ? DarkTheme : DefaultTheme),
+    ...DefaultTheme,
     colors: {
-      ...(isDarkMode ? DarkTheme : DefaultTheme).colors,
+      ...DefaultTheme.colors,
       primary: palette.primary,
       background: palette.background,
       card: palette.surfaceContainer,
@@ -41,7 +40,7 @@ function RootNavigation() {
 
   return (
     <ThemeProvider value={navTheme}>
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
+      <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: palette.background } }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="auth" />

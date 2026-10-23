@@ -12,7 +12,6 @@ import {
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppIcon } from "@/components/app-icon";
-import { ThemeModeToggleButton } from "@/components/common";
 import { TYPE, useTheme } from "@/constants/theme";
 import { useStore } from "@/data/store";
 import { isGoogleConfigured } from "@/auth/oauth-config";
@@ -20,18 +19,26 @@ import { fetchGoogleUserInfo, signInWithApple, useGoogleAuth } from "@/auth/soci
 
 export default function AuthScreen() {
   const [isLoginTab, setIsLoginTab] = useState(true);
-  const [emailOrUsername, setEmailOrUsername] = useState("alex.green@example.com");
-  const [password, setPassword] = useState("password123");
-  const [fullName, setFullName] = useState("Alex Green");
-  const [username, setUsername] = useState("alex_green");
-  const [confirmPassword, setConfirmPassword] = useState("password123");
-  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  // Login fields are kept separate from sign-up fields so demo credentials can
+  // never leak into the sign-up form when switching tabs.
+  const [loginEmailOrUsername, setLoginEmailOrUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
+
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [signupPasswordVisible, setSignupPasswordVisible] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [oauthBusy, setOauthBusy] = useState(false);
   const { promptAsync: googlePromptAsync } = useGoogleAuth();
 
   const { colors } = useTheme();
-  const { isDarkMode, toggleDarkMode, login, loginWithProvider, signup, continueAsGuest, showToast } = useStore();
+  const { login, loginWithProvider, signup, continueAsGuest, showToast } = useStore();
 
   const handleLogin = (email: string, pwd: string) => {
     login(email, pwd);
@@ -104,21 +111,21 @@ export default function AuthScreen() {
 
   const submit = () => {
     if (isLoginTab) {
-      if (!emailOrUsername.trim() || !password.trim()) {
+      if (!loginEmailOrUsername.trim() || !loginPassword.trim()) {
         setErrorMessage("Please enter email/username and password");
         return;
       }
-      handleLogin(emailOrUsername.trim(), password);
+      handleLogin(loginEmailOrUsername.trim(), loginPassword);
     } else {
-      if (!fullName.trim() || !emailOrUsername.trim() || !password.trim()) {
+      if (!fullName.trim() || !signupEmail.trim() || !signupPassword.trim()) {
         setErrorMessage("Please fill in all fields to create your account");
         return;
       }
-      if (password !== confirmPassword) {
+      if (signupPassword !== confirmPassword) {
         setErrorMessage("Passwords do not match");
         return;
       }
-      handleSignup(fullName.trim(), emailOrUsername.trim(), username.trim(), password);
+      handleSignup(fullName.trim(), signupEmail.trim(), username.trim(), signupPassword);
     }
   };
 
@@ -135,7 +142,6 @@ export default function AuthScreen() {
               EcoTrade
             </Text>
           </View>
-          <ThemeModeToggleButton isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
         </View>
 
         <ScrollView
@@ -183,26 +189,26 @@ export default function AuthScreen() {
             </View>
 
             {errorMessage && (
-              <View style={[styles.errorBox, { backgroundColor: "#FCE8E6" }, isDarkMode && { backgroundColor: "#5C1A17" }]}>
-                <Text style={{ fontSize: 12, color: isDarkMode ? "#F9DEDC" : "#8C1D18", textAlign: "center" }}>
+              <View style={[styles.errorBox, { backgroundColor: "#FCE8E6" }]}>
+                <Text style={{ fontSize: 12, color: "#8C1D18", textAlign: "center" }}>
                   {errorMessage}
                 </Text>
               </View>
             )}
 
             {isLoginTab ? (
-              <View style={{ gap: 14 }}>
+              <View style={[styles.formColumn, { gap: 14 }]}>
                 <AuthField
                   label="Username or Email"
                   icon="mail"
                   placeholder="you@example.com"
-                  value={emailOrUsername}
+                  value={loginEmailOrUsername}
                   onChangeText={(t) => {
-                    setEmailOrUsername(t);
+                    setLoginEmailOrUsername(t);
                     setErrorMessage(null);
                   }}
                 />
-                <View>
+                <View style={styles.formColumn}>
                   <View style={styles.rowBetween}>
                     <Text style={[TYPE.labelMedium, { color: colors.onSurface }]}>Password</Text>
                     <Pressable onPress={() => setErrorMessage("Password reset link sent to registered email")}>
@@ -214,16 +220,16 @@ export default function AuthScreen() {
                   <AuthField
                     icon="lock"
                     placeholder="••••••••"
-                    value={password}
-                    secureTextEntry={!passwordVisible}
+                    value={loginPassword}
+                    secureTextEntry={!loginPasswordVisible}
                     onChangeText={(t) => {
-                      setPassword(t);
+                      setLoginPassword(t);
                       setErrorMessage(null);
                     }}
                     trailing={
-                      <Pressable onPress={() => setPasswordVisible((v) => !v)} hitSlop={8}>
+                      <Pressable onPress={() => setLoginPasswordVisible((v) => !v)} hitSlop={8}>
                         <AppIcon
-                          name={passwordVisible ? "visibility" : "visibility_off"}
+                          name={loginPasswordVisible ? "visibility" : "visibility_off"}
                           size={22}
                           color={colors.outline}
                         />
@@ -234,11 +240,11 @@ export default function AuthScreen() {
                 </View>
               </View>
             ) : (
-              <View style={{ gap: 12 }}>
+              <View style={[styles.formColumn, { gap: 12 }]}>
                 <AuthField
                   label="Full Name"
                   icon="person"
-                  placeholder="Alex Green"
+                  placeholder="Your full name"
                   value={fullName}
                   onChangeText={(t) => {
                     setFullName(t);
@@ -248,7 +254,7 @@ export default function AuthScreen() {
                 <AuthField
                   label="Username"
                   icon="alternate_email"
-                  placeholder="alex_green"
+                  placeholder="Choose a username"
                   value={username}
                   onChangeText={(t) => {
                     setUsername(t);
@@ -259,9 +265,9 @@ export default function AuthScreen() {
                   label="Email Address"
                   icon="mail"
                   placeholder="you@example.com"
-                  value={emailOrUsername}
+                  value={signupEmail}
                   onChangeText={(t) => {
-                    setEmailOrUsername(t);
+                    setSignupEmail(t);
                     setErrorMessage(null);
                   }}
                 />
@@ -269,16 +275,16 @@ export default function AuthScreen() {
                   label="Password"
                   icon="lock"
                   placeholder="••••••••"
-                  value={password}
-                  secureTextEntry={!passwordVisible}
+                  value={signupPassword}
+                  secureTextEntry={!signupPasswordVisible}
                   onChangeText={(t) => {
-                    setPassword(t);
+                    setSignupPassword(t);
                     setErrorMessage(null);
                   }}
                   trailing={
-                    <Pressable onPress={() => setPasswordVisible((v) => !v)} hitSlop={8}>
+                    <Pressable onPress={() => setSignupPasswordVisible((v) => !v)} hitSlop={8}>
                       <AppIcon
-                        name={passwordVisible ? "visibility" : "visibility_off"}
+                        name={signupPasswordVisible ? "visibility" : "visibility_off"}
                         size={22}
                         color={colors.outline}
                       />
@@ -309,8 +315,8 @@ export default function AuthScreen() {
             <Pressable
               onPress={() => {
                 setIsLoginTab(true);
-                setEmailOrUsername("alex.green@example.com");
-                setPassword("password123");
+                setLoginEmailOrUsername("alex.green@example.com");
+                setLoginPassword("password123");
                 setErrorMessage(null);
               }}
               style={[styles.demoFillBtn, { backgroundColor: `${colors.surfaceVariant}99`, borderColor: `${colors.outlineVariant}4D` }]}
@@ -408,7 +414,7 @@ function AuthField({
   const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
   return (
-    <View style={containerStyle}>
+    <View style={[styles.fieldContainer, containerStyle]}>
       {!!label && (
         <Text style={[TYPE.labelMedium, { color: colors.onSurface, marginBottom: 6 }]}>{label}</Text>
       )}
@@ -458,6 +464,10 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: "center",
   },
+  // Form columns must stretch: authCard centers its children, which otherwise
+  // leaves the text fields at their intrinsic (narrow) width.
+  formColumn: { width: "100%", alignSelf: "stretch" },
+  fieldContainer: { width: "100%", alignSelf: "stretch" },
   headerIcon60: { width: 60, height: 60, borderRadius: 30, alignItems: "center", justifyContent: "center" },
 
   segmentedWrap: { flexDirection: "row", borderRadius: 999, borderWidth: 1, padding: 4, gap: 4, alignSelf: "stretch" },

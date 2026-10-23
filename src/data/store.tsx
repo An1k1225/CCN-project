@@ -120,7 +120,6 @@ export interface EcoTradeStore {
   userProfile: UserProfile;
   tradeOffers: TradeOffer[];
   conversations: ChatConversation[];
-  isDarkMode: boolean;
   privacyModeEnabled: boolean;
   isLoggedIn: boolean;
   hasAccount: boolean;
@@ -130,7 +129,6 @@ export interface EcoTradeStore {
   tradeProposalTarget: ListingItem | null;
   toastMessage: string | null;
 
-  toggleDarkMode: () => void;
   togglePrivacyMode: () => void;
   toggleFavorite: (itemId: string) => void;
   setSearchQuery: (query: string) => void;
@@ -187,7 +185,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [tradeOffers, setTradeOffers] = useState(initialTradeOffers);
   const [conversations, setConversations] = useState<ChatConversation[]>(initialConversations);
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [privacyModeEnabled, setPrivacyModeEnabled] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
@@ -241,8 +238,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     },
     []
   );
-
-  const toggleDarkMode = useCallback(() => setIsDarkMode((v) => !v), []);
 
   const togglePrivacyMode = useCallback(() => {
     const next = !privacyModeRef.current;
@@ -561,7 +556,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     userProfile,
     tradeOffers,
     conversations,
-    isDarkMode,
     privacyModeEnabled,
     isLoggedIn,
     hasAccount,
@@ -570,7 +564,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     showFilterSheet,
     tradeProposalTarget,
     toastMessage,
-    toggleDarkMode,
     togglePrivacyMode,
     toggleFavorite,
     setSearchQuery,

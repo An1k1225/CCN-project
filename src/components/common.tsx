@@ -12,35 +12,6 @@ import { AppIcon } from "@/components/app-icon";
 import { EcoImage } from "@/components/eco-image";
 import { Palette, TYPE, useTheme } from "@/constants/theme";
 
-export function ThemeModeToggleButton({
-  isDarkMode,
-  onToggle,
-}: {
-  isDarkMode: boolean;
-  onToggle: () => void;
-}) {
-  const { colors } = useTheme();
-  return (
-    <Pressable
-      onPress={onToggle}
-      style={({ pressed }) => [
-        styles.iconCircle40,
-        {
-          backgroundColor: colors.surfaceVariant,
-          borderColor: `${colors.outlineVariant}80`,
-          opacity: pressed ? 0.7 : 1,
-        },
-      ]}
-    >
-      <AppIcon
-        name={isDarkMode ? "light_mode" : "dark_mode"}
-        size={20}
-        color={isDarkMode ? "#FFD54F" : colors.primary}
-      />
-    </Pressable>
-  );
-}
-
 export function TopRightProfileAvatar({
   avatarUrl,
   onClick,
@@ -68,16 +39,12 @@ export function TopEcoHeader({
   onLocationClick = () => {},
   onProfileClick,
   avatarUrl = "",
-  onToggleTheme,
-  isDarkMode = false,
 }: {
   title?: string;
   locationName?: string;
   onLocationClick?: () => void;
   onProfileClick: () => void;
   avatarUrl?: string;
-  onToggleTheme?: () => void;
-  isDarkMode?: boolean;
 }) {
   const { colors } = useTheme();
   return (
@@ -102,9 +69,6 @@ export function TopEcoHeader({
       </View>
 
       <View style={styles.headerRightRow}>
-        {onToggleTheme && (
-          <ThemeModeToggleButton isDarkMode={isDarkMode} onToggle={onToggleTheme} />
-        )}
         <TopRightProfileAvatar avatarUrl={avatarUrl} onClick={onProfileClick} />
       </View>
     </View>
@@ -404,14 +368,6 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   selfStart: { alignSelf: "flex-start" },
 
-  iconCircle40: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   avatar42: {
     width: 42,
     height: 42,

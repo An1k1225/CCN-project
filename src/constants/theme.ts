@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
-import { useStore } from "@/data/store";
 
 // Sleek Interface Brand Palette - Lilac, Obsidian, Violet & Slate
 export const LIGHT_COLORS = {
@@ -43,47 +42,6 @@ export const LIGHT_COLORS = {
   mutedText: "#938F99",
 };
 
-// Dark Theme Colors - Obsidian, Sleek Charcoal & Luminous Lilac
-export const DARK_COLORS = {
-  primary: "#D0BCFF",
-  onPrimary: "#381E72",
-  primaryContainer: "#4F378B",
-  onPrimaryContainer: "#EADDFF",
-  primaryFixed: "#EADDFF",
-  primaryFixedDim: "#D0BCFF",
-
-  background: "#1C1B1F",
-  onBackground: "#E6E1E5",
-  surface: "#1C1B1F",
-  onSurface: "#E6E1E5",
-  surfaceVariant: "#49454F",
-  onSurfaceVariant: "#CAC4D0",
-
-  surfaceContainerLowest: "#0F0E11",
-  surfaceContainerLow: "#1D1B20",
-  surfaceContainer: "#2B2930",
-  surfaceContainerHigh: "#36343B",
-  surfaceContainerHighest: "#49454F",
-
-  secondary: "#CCC2DC",
-  secondaryContainer: "#4A4458",
-  onSecondaryContainer: "#E8DEF8",
-
-  tertiary: "#EFB8C8",
-  tertiaryContainer: "#633B48",
-  onTertiaryContainer: "#FFD8E4",
-  tertiaryFixed: "#FFD8E4",
-
-  outline: "#938F99",
-  outlineVariant: "#49454F",
-
-  starGold: "#FFB800",
-  accentLilac: "#D0BCFF",
-  deepViolet: "#381E72",
-  slateBorder: "#49454F",
-  mutedText: "#938F99",
-};
-
 export type Palette = typeof LIGHT_COLORS;
 
 export const RADIUS: Record<string, number> = {
@@ -95,15 +53,10 @@ export const RADIUS: Record<string, number> = {
   xxl: 24,
 };
 
+// EcoTrade is light-theme only. Kept as a hook so every screen keeps a single
+// source of truth for the palette.
 export function useTheme() {
-  const { isDarkMode } = useStore();
-  return useMemo(
-    () => ({
-      isDark: isDarkMode,
-      colors: (isDarkMode ? DARK_COLORS : LIGHT_COLORS) as Palette,
-    }),
-    [isDarkMode]
-  );
+  return { isDark: false, colors: LIGHT_COLORS as Palette };
 }
 
 export function useThemedStyles<T extends Record<string, any>>(

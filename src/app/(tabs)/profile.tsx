@@ -1,13 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ThemeModeToggleButton } from "@/components/common";
 import { TYPE, useTheme } from "@/constants/theme";
-import { useStore } from "@/data/store";
 
 export default function ProfileTab() {
   const { colors } = useTheme();
-  const { isDarkMode, toggleDarkMode } = useStore();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -17,7 +14,6 @@ export default function ProfileTab() {
             <Text style={[TYPE.displayMedium, { fontWeight: "700", color: colors.primary }]}>
               Personal Dashboard
             </Text>
-            <ThemeModeToggleButton isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
           </View>
         </View>
 

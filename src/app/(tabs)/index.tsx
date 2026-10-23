@@ -27,8 +27,6 @@ export default function HomeScreen() {
     filterState,
     setCategoryFilter,
     toggleFavorite,
-    toggleDarkMode,
-    isDarkMode,
     togglePrivacyMode,
     openFilterSheet,
     showFilterSheet,
@@ -54,8 +52,6 @@ export default function HomeScreen() {
         onLocationClick={togglePrivacyMode}
         onProfileClick={goToProfile}
         avatarUrl={userProfile.avatarUrl}
-        isDarkMode={isDarkMode}
-        onToggleTheme={toggleDarkMode}
       />
 
       {/* Search Bar Trigger + Filter */}

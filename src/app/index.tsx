@@ -10,9 +10,7 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppIcon } from "@/components/app-icon";
 import { EcoImage } from "@/components/eco-image";
-import { ThemeModeToggleButton } from "@/components/common";
 import { TYPE, useTheme } from "@/constants/theme";
-import { useStore } from "@/data/store";
 
 const ONBOARDING_IMG_1 =
   "https://lh3.googleusercontent.com/aida/AP1WRLudxBTe5lSi9c7ny-wVn8viTEwvDvqASpTKdUXr7AFg6AO30yrOiEaU1OWtPELhRzEqdB12l4NVbWagaQyy8EH-7sMUEpTBHeCyTvhe7tf6_QqB4H4YS0P2rXg-_h7vBDwSbRLMjqU46sP49m46o9EU-XQ9i0Um9yKoRpASF5h7AiDh90wX_lkCL49MuKf7kocBRo_P2hkDIe84O6ZFrFFhL_X5k2e7VHmpV6yFgSjOSPQEBhQoB9aRLMA";
@@ -29,7 +27,6 @@ const PRIVACY_NOTES = [
 export default function OnboardingScreen() {
   const [step, setStep] = useState(0);
   const { colors } = useTheme();
-  const { isDarkMode, toggleDarkMode } = useStore();
 
   const goAuth = () => router.replace("/auth");
 
@@ -53,7 +50,6 @@ export default function OnboardingScreen() {
           <StepIndicator currentStep={step} totalSteps={4} />
 
           <View style={styles.headerRight}>
-            <ThemeModeToggleButton isDarkMode={isDarkMode} onToggle={toggleDarkMode} />
             <Pressable onPress={goAuth} hitSlop={8}>
               <Text style={[TYPE.labelLarge, { fontWeight: "600", color: colors.primary }]}>Skip</Text>
             </Pressable>
